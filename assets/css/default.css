@@ -9,6 +9,11 @@ body {
   background-color: rgb(255, 0, 0, 0.5);
 }
 
+
+.banner {
+  text-align: center; 
+}
+
 .channel-profile > * {
   font-size: 1.17em;
   font-weight: bold;
