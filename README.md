@@ -4,6 +4,25 @@
 
 ## Invidious is an alternative front-end to YouTube
 
+## Source Changes:
+
+- Watch Page
+  - Updated site title to reflect website name.
+- Trending Page
+  - Updated site title to reflect website name.
+- Template Page
+  - Updated BTC address.
+  - Added banner class to center banner on page.
+  - Remove current version from footer, can be acquired from API.
+  - Removed documentation link.
+  - Removed Monero donation link.
+  - Updated site header to reflect site name.
+  - Source copyright added to footer. (Pending Installation)
+- Popular Page
+  - Updated site title to reflect website name.
+- Default CSS
+  - Added CSS to center banner text.
+
 ## Invidious instances:
 
 [Public Invidious instances are listed here.](https://github.com/iv-org/documentation/blob/master/Invidious-Instances.md)
