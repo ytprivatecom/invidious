@@ -21,6 +21,7 @@ var options = {
         ]
     },
     html5: {
+        preloadTextTracks: false,
         hls: {
             overrideNative: true
         }
@@ -546,4 +547,22 @@ window.addEventListener('keydown', e => {
 // Since videojs-share can sometimes be blocked, we defer it until last
 if (player.share) {
     player.share(shareOptions);
+}
+
+// show the preferred caption by default
+if (player_data.preferred_caption_found) {
+    player.ready(() => {
+        player.textTracks()[1].mode = 'showing';
+    });
+}
+
+// Safari audio double duration fix
+if (navigator.vendor == "Apple Computer, Inc." && video_data.params.listen) {
+    player.on('loadedmetadata', function () {
+        player.on('timeupdate', function () {
+            if (player.remainingTime() < player.duration() / 2) {
+                player.currentTime(player.duration() + 1);
+            }
+        });
+    });
 }
