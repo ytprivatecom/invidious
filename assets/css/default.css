@@ -5,6 +5,12 @@ body {
     Arial, sans-serif;
 }
 
+#contents {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .deleted {
   background-color: rgb(255, 0, 0, 0.5);
 }
@@ -285,14 +291,16 @@ input[type="search"]::-webkit-search-cancel-button {
  * Footer
  */
 
-.footer {
-  color: #666666;
-  margin: 2em 0;
+footer {
+  color: #919191;
+  margin-top: auto;
+  padding: 1.5em 0;
   text-align: center;
+  max-height: 30vh;
 }
 
-body .footer a {
-  color: inherit;
+footer a {
+  color: #919191 !important;
   text-decoration: underline;
 }
 
@@ -500,7 +508,8 @@ video.video-js {
  */
 
 .light-theme a:hover,
-.light-theme a:active {
+.light-theme a:active,
+.light-theme summary:hover {
   color: #075A9E !important;
 }
 
@@ -526,7 +535,8 @@ video.video-js {
 
 @media (prefers-color-scheme: light) {
   .no-theme a:hover,
-  .no-theme a:active {
+  .no-theme a:active,
+  .no-theme summary:hover  {
     color: #075A9E !important;
   }
 
@@ -556,7 +566,8 @@ video.video-js {
  */
 
 .dark-theme a:hover,
-.dark-theme a:active {
+.dark-theme a:active,
+.dark-theme summary:hover {
   color: rgb(0, 182, 240);
 }
 
@@ -634,5 +645,32 @@ body.dark-theme {
 }
 
 #filters {
-  display: none;
+  display: inline;
+  margin-top: 15px;
+}
+
+#filters > div {
+  display: inline-block;
+}
+
+#filters > summary {
+  display: block;
+  margin-bottom: 15px;
+}
+
+#filters > summary::before {
+  content: "[ + ]";
+  font-size: 1.5em;
+}
+
+#filters[open] > summary::before {
+  content: "[ - ]";
+  font-size: 1.5em;
+}
+
+/*With commit d9528f5 all contents of the page is now within a flexbox. However,
+the hr element is rendered improperly within one.
+See https://stackoverflow.com/a/34372979 for more info */
+hr {
+  margin: auto 0 auto 0;
 }

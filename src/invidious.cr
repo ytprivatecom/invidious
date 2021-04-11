@@ -289,6 +289,7 @@ before_all do |env|
   preferences.dark_mode = dark_mode
   preferences.thin_mode = thin_mode
   preferences.locale = locale
+  env.set "preferences", preferences
 
   current_page = env.request.path
   if env.request.query
@@ -307,9 +308,17 @@ end
 Invidious::Routing.get "/", Invidious::Routes::Misc, :home
 Invidious::Routing.get "/privacy", Invidious::Routes::Misc, :privacy
 Invidious::Routing.get "/licenses", Invidious::Routes::Misc, :licenses
-Invidious::Routing.get "/watch", Invidious::Routes::Watch
+
+Invidious::Routing.get "/watch", Invidious::Routes::Watch, :handle
+Invidious::Routing.get "/watch/:id", Invidious::Routes::Watch, :redirect
+Invidious::Routing.get "/shorts/:id", Invidious::Routes::Watch, :redirect
+Invidious::Routing.get "/w/:id", Invidious::Routes::Watch, :redirect
+Invidious::Routing.get "/v/:id", Invidious::Routes::Watch, :redirect
+Invidious::Routing.get "/e/:id", Invidious::Routes::Watch, :redirect
+
 Invidious::Routing.get "/embed/", Invidious::Routes::Embed, :redirect
 Invidious::Routing.get "/embed/:id", Invidious::Routes::Embed, :show
+
 Invidious::Routing.get "/view_all_playlists", Invidious::Routes::Playlists, :index
 Invidious::Routing.get "/create_playlist", Invidious::Routes::Playlists, :new
 Invidious::Routing.post "/create_playlist", Invidious::Routes::Playlists, :create
@@ -322,12 +331,15 @@ Invidious::Routing.get "/add_playlist_items", Invidious::Routes::Playlists, :add
 Invidious::Routing.post "/playlist_ajax", Invidious::Routes::Playlists, :playlist_ajax
 Invidious::Routing.get "/playlist", Invidious::Routes::Playlists, :show
 Invidious::Routing.get "/mix", Invidious::Routes::Playlists, :mix
+
 Invidious::Routing.get "/opensearch.xml", Invidious::Routes::Search, :opensearch
 Invidious::Routing.get "/results", Invidious::Routes::Search, :results
 Invidious::Routing.get "/search", Invidious::Routes::Search, :search
+
 Invidious::Routing.get "/login", Invidious::Routes::Login, :login_page
 Invidious::Routing.post "/login", Invidious::Routes::Login, :login
 Invidious::Routing.post "/signout", Invidious::Routes::Login, :signout
+
 Invidious::Routing.get "/preferences", Invidious::Routes::PreferencesRoute, :show
 Invidious::Routing.post "/preferences", Invidious::Routes::PreferencesRoute, :update
 Invidious::Routing.get "/toggle_theme", Invidious::Routes::PreferencesRoute, :toggle_theme
@@ -1698,7 +1710,7 @@ get "/channel/:ucid" do |env|
     sort_options = {"last", "oldest", "newest"}
     sort_by ||= "last"
 
-    items, continuation = fetch_channel_playlists(channel.ucid, channel.author, channel.auto_generated, continuation, sort_by)
+    items, continuation = fetch_channel_playlists(channel.ucid, channel.author, continuation, sort_by)
     items.uniq! do |item|
       if item.responds_to?(:title)
         item.title
@@ -1765,7 +1777,7 @@ get "/channel/:ucid/playlists" do |env|
     next env.redirect "/channel/#{channel.ucid}"
   end
 
-  items, continuation = fetch_channel_playlists(channel.ucid, channel.author, channel.auto_generated, continuation, sort_by)
+  items, continuation = fetch_channel_playlists(channel.ucid, channel.author, continuation, sort_by)
   items = items.select { |item| item.is_a?(SearchPlaylist) }.map { |item| item.as(SearchPlaylist) }
   items.each { |item| item.author = "" }
 
@@ -2053,6 +2065,9 @@ get "/api/v1/comments/:id" do |env|
   format = env.params.query["format"]?
   format ||= "json"
 
+  action = env.params.query["action"]?
+  action ||= "action_get_comments"
+
   continuation = env.params.query["continuation"]?
   sort_by = env.params.query["sort_by"]?.try &.downcase
 
@@ -2060,7 +2075,7 @@ get "/api/v1/comments/:id" do |env|
     sort_by ||= "top"
 
     begin
-      comments = fetch_youtube_comments(id, PG_DB, continuation, format, locale, thin_mode, region, sort_by: sort_by)
+      comments = fetch_youtube_comments(id, PG_DB, continuation, format, locale, thin_mode, region, sort_by: sort_by, action: action)
     rescue ex
       next error_json(500, ex)
     end
@@ -2463,7 +2478,7 @@ end
       next error_json(500, ex)
     end
 
-    items, continuation = fetch_channel_playlists(channel.ucid, channel.author, channel.auto_generated, continuation, sort_by)
+    items, continuation = fetch_channel_playlists(channel.ucid, channel.author, continuation, sort_by)
 
     JSON.build do |json|
       json.object do
