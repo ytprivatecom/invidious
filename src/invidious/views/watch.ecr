@@ -25,6 +25,17 @@
 <link rel="alternate" href="https://www.youtube.com/watch?v=<%= video.id %>">
 <%= rendered "components/player_sources" %>
 <title><%= HTML.escape(video.title) %> - YTPrivate</title>
+<!-- Description expansion also updates the 'Show more' button to 'Show less' so
+ we're going to need to do it here in order to allow for translations.
+  -->
+ <style>
+ #descexpansionbutton + label > a::after {
+     content: "<%= translate(locale, "Show more") %>"
+ }
+ #descexpansionbutton:checked + label > a::after {
+     content: "<%= translate(locale, "Show less") %>"
+ }
+ </style>
 <% end %>
 
 <script id="video_data" type="application/json">
