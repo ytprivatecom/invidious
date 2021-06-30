@@ -7,6 +7,19 @@ on:
       - "api-only"
   pull_request:
     branches: "*"
+    paths-ignore:
+      - "*.md"
+      - LICENCE
+      - TRANSLATION
+      - invidious.service
+      - .git*
+      - .editorconfig
+
+      - screenshots/*
+      - assets/**
+      - config/**
+      - .github/ISSUE_TEMPLATE/*
+      - kubernetes/**
 
 jobs:
   build:
@@ -19,7 +32,7 @@ jobs:
       - name: Install Crystal
         uses: oprypin/install-crystal@v1.2.4
         with:
-          crystal: 0.36.1
+          crystal: 1.0.0
       
       - name: Cache Shards
         uses: actions/cache@v2
